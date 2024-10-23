@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.ParticleSystem;
 
 public class MovementControls : MonoBehaviour
 {
     public float maxVelocity;
     public float acceleration;
     public float sideAcceleration;
+    public float maxSideAcceleration;
 
     public float rotationSpeed;
     public Rigidbody rigidbody;
@@ -22,48 +24,56 @@ public class MovementControls : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        Vector3 velocity = rigidbody.linearVelocity;
+        Vector3 localVelocity = transform.InverseTransformDirection(rigidbody.linearVelocity);
 
-        if (moveAction.ReadValue<Vector2>().y > 0)
+        Vector2 moveVector2 = moveAction.ReadValue<Vector2>();
+        float rotationAxis = rotateAction.ReadValue<float>();
+
+        if (moveVector2.y > 0)
         {
-            velocity += transform.forward * (acceleration * Time.deltaTime);
+            localVelocity += Vector3.forward * (acceleration * Time.deltaTime);
         }
 
-        if (moveAction.ReadValue<Vector2>().y < 0)
+        if (moveVector2.y < 0)
         {
-            velocity -= transform.forward * (acceleration * Time.deltaTime);
+            localVelocity -= Vector3.forward * (acceleration * Time.deltaTime);
         }
 
-        if (moveAction.ReadValue<Vector2>().x > 0)
+        if (moveVector2.x > 0)
         {
-            velocity += transform.right * (sideAcceleration * Time.deltaTime);
+            localVelocity += Vector3.right * (sideAcceleration * Time.deltaTime);
         }
 
-        if (moveAction.ReadValue<Vector2>().x < 0)
+        if (moveVector2.x < 0)
         {
-            velocity += -transform.right * (sideAcceleration * Time.deltaTime);
+            localVelocity += -Vector3.right * (sideAcceleration * Time.deltaTime);
         }
 
-        if (rotateAction.ReadValue<float>() != 0)
+        if (rotationAxis != 0)
         {
-            transform.Rotate(Vector3.up, rotateAction.ReadValue<float>() * rotationSpeed * Time.deltaTime);
+            transform.Rotate(Vector3.up, rotationAxis * rotationSpeed * Time.deltaTime);
         }
 
-        if (moveAction.ReadValue<Vector2>().y == 0 && moveAction.ReadValue<Vector2>().x == 0)
+        if (moveVector2.x == 0)
         {
-            velocity = Vector3.MoveTowards(velocity, Vector3.zero, acceleration * Time.deltaTime);
+            localVelocity.x = Mathf.MoveTowards(localVelocity.x, 0, sideAcceleration * Time.deltaTime);
         }
 
-        var localVelocity = transform.InverseTransformDirection(velocity);
-
-        if (localVelocity.z > maxVelocity)
+        if (moveVector2.y == 0)
         {
-            localVelocity.z = maxVelocity;
-            velocity = transform.TransformDirection(localVelocity);
+            localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0, acceleration * Time.deltaTime);
         }
 
-        rigidbody.linearVelocity = velocity;
+        if (Mathf.Abs(localVelocity.x) > maxSideAcceleration)
+        {
+            localVelocity.x = maxSideAcceleration * Mathf.Sign(localVelocity.x);
+        }
 
-        Debug.Log(transform.InverseTransformDirection(velocity) + " " + velocity.ma);
+        if (Mathf.Abs(localVelocity.z) > maxVelocity)
+        {
+            localVelocity.z = maxVelocity * Mathf.Sign(localVelocity.z);
+        }
+
+        rigidbody.linearVelocity = transform.TransformDirection(localVelocity);
     }
 }
