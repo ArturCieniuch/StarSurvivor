@@ -136,7 +136,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 4
   m_CollisionDetection: 0
 --- !u!114 &8527655723525675907
 MonoBehaviour:
@@ -150,14 +150,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50fa485f51f03c3469d85cf2f0760d98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyRigidbody: {fileID: 784794474077602209}
   damage: 1
-  trail: {fileID: 107141173866442461}
+  maxHp: 5
   speed: 4
   waitTime: 0
   refreshTargetTime: 0
   rotationDegrees: 0
   trackingSpeed: 2
+  enemyRigidbody: {fileID: 784794474077602209}
+  trail: {fileID: 107141173866442461}
 --- !u!1 &6660723166178995848
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,7 +236,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 5
+  m_Time: 2
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
