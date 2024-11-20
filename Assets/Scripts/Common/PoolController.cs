@@ -13,7 +13,7 @@ public class PoolController : MonoBehaviour
         Instance = this;
     }
 
-    public PoolObject GetObject(PoolObject objectToGet)
+    public T GetObject<T>(PoolObject objectToGet) where T : PoolObject
     {
         Type objectType = objectToGet.GetType();
 
@@ -27,7 +27,7 @@ public class PoolController : MonoBehaviour
             pools[objectType].Add(objectToGet.objectName, new GenericPool(objectToGet));
         }
 
-        return pools[objectType][objectToGet.objectName].GetFromPool();
+        return pools[objectType][objectToGet.objectName].GetFromPool() as T;
     }
 
     public void ReturnObject(PoolObject objectToReturn)

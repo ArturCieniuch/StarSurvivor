@@ -14,6 +14,10 @@ public class EnemyManager : MonoBehaviour
     public int timeBetweenSpawns;
     public int enemiesInSpawnWave;
     public int maxEnemies;
+    [Header("Difficulty")] 
+    public float timeBetweenChange;
+    public int difficultyChange;
+
     [Header("Distance")]
     public int minDistanceToPlayer;
     public int maxDistanceToPlayer;
@@ -22,6 +26,7 @@ public class EnemyManager : MonoBehaviour
     public Dictionary<string, Enemy> enemies;
 
     private float timer;
+    private float difficultyTimer;
 
     public UnityEvent<Enemy> enemyRemoved;
 
@@ -45,7 +50,15 @@ public class EnemyManager : MonoBehaviour
             timer = 0;
         }
 
+        if (difficultyTimer >= timeBetweenChange)
+        {
+            enemiesInSpawnWave += difficultyChange;
+            difficultyTimer = 0;
+        }
+
         timer += Time.deltaTime;
+        difficultyTimer += Time.deltaTime;
+
     }
 
     private void SpawnEnemy()
@@ -55,14 +68,17 @@ public class EnemyManager : MonoBehaviour
             return;
         }
 
-        Vector2 point = Random.insideUnitCircle.normalized * Random.Range(minDistanceToPlayer, maxDistanceToPlayer);
-        Vector3 enemyPosition = new Vector3(point.x + transform.position.x, 0, point.y + transform.position.z);
-        Enemy enemy = enemyPool.GetFromPool();
-        enemy.transform.position = enemyPosition;
-        Vector3 direction = (Player.Instance.transform.position - enemyPosition).normalized;
-        enemy.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+        Vector3 playerPosition = Player.Instance.transform.position;
 
-        enemy.ResetTrail();
+        Vector2 point = Random.insideUnitCircle.normalized * Random.Range(minDistanceToPlayer, maxDistanceToPlayer);
+        Vector3 enemyPosition = new Vector3(point.x + playerPosition.x, 0, point.y + playerPosition.z + transform.position.z);
+
+        Enemy enemy = PoolController.Instance.GetObject<Enemy>(enemyToSpawn);
+        enemy.transform.position = enemyPosition;
+        //Vector3 direction = (enemyPosition - playerPosition).normalized;
+        //enemy.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+
+        enemy.StartMovement();
 
         enemies.Add(enemy.name, enemy);
     }
@@ -71,32 +87,31 @@ public class EnemyManager : MonoBehaviour
     {
         enemyRemoved.Invoke(enemyToRemove);
         enemies.Remove(enemyToRemove.name);
-        enemyPool.ReturnToPool(enemyToRemove);
+        PoolController.Instance.ReturnObject(enemyToRemove);
     }
 
     public void SpawnPoint(Vector3 position)
     {
-        Point point = pointPool.GetFromPool();
+        Point point = PoolController.Instance.GetObject<Point>(pointPrefab);
         point.transform.position = position;
     }
 
     public void ReturnPoint(Point pointToReturn)
     {
-        pointPool.ReturnToPool(pointToReturn);
+        PoolController.Instance.ReturnObject(pointToReturn);
     }
 
     public Enemy GetEnemy(string name)
     {
-        return enemies[name];
+        return enemies.ContainsKey(name) ? enemies[name] : null;
     }
 
     private void OnDrawGizmosSelected()
     {
-                if (showDebug)
+        if (showDebug)
         {
             Debug.DrawArc(0, 360, transform.position, Quaternion.LookRotation(transform.forward, Vector3.up), minDistanceToPlayer, Color.green, false, false);
             Debug.DrawArc(0, 360, transform.position, Quaternion.LookRotation(transform.forward, Vector3.up), maxDistanceToPlayer, Color.red, false, false);
         }
-
     }
 }

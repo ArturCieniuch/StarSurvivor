@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Rendering;
 using static UnityEngine.EventSystems.EventTrigger;
 
@@ -15,20 +16,13 @@ public class Turret : MonoBehaviour
     [SerializeField] private float range;
     [SerializeField] private bool shotOnTargetOnly;
 
-    [SerializeField] private int minRightAngle;
-    [SerializeField] private int maxRightAngle;
-    [SerializeField] private int minLeftAngle;
-    [SerializeField] private int maxLeftAngle;
-    [SerializeField] private bool showDebug;
+    private TurretSlot.TurretSlotData turretSlotData;
 
     [Header("Components")]
-    [SerializeField] private ParticleSystem particleSystem;
+    [SerializeField] private ShotController shotController;
     [SerializeField] private SphereCollider trigger;
-    [SerializeField] private ParticleCollision particleCollision;
     [SerializeField] private EnemyTracker enemyTracker;
-    [SerializeField] private Transform shipTransform;
     [SerializeField] private Transform angleTracker;
-
 
     private float timer;
 
@@ -36,9 +30,9 @@ public class Turret : MonoBehaviour
     {
         EnemyManager.Instance.enemyRemoved.AddListener(OnEnemyRemoved);
         enemies = new List<Enemy>(EnemyManager.Instance.maxEnemies);
-        particleCollision.SetUp(damagePerSecond / fireRate);
+        shotController.SetUp(damagePerSecond / fireRate);
         trigger.radius = range;
-        angleTracker.SetParent(shipTransform);
+        angleTracker.SetParent(Player.Instance.transform);
     }
 
     private void OnEnemyRemoved(Enemy enemy)
@@ -46,25 +40,30 @@ public class Turret : MonoBehaviour
         enemies.Remove(enemy);
     }
 
+    public void SetTurretSlotData(TurretSlot.TurretSlotData data)
+    {
+        this.turretSlotData = data;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Enemy"))
+        if (!other.attachedRigidbody.CompareTag("Enemy"))
         {
             return;
         }
 
-        Enemy enemy = other.GetComponent<Enemy>();
+        Enemy enemy = other.attachedRigidbody.GetComponent<Enemy>();
         enemies.Add(enemy);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("Enemy"))
+        if (!other.attachedRigidbody.CompareTag("Enemy"))
         {
             return;
         }
 
-        Enemy enemy = other.GetComponent<Enemy>();
+        Enemy enemy = other.attachedRigidbody.GetComponent<Enemy>();
         enemies.Remove(enemy);
     }
 
@@ -122,11 +121,11 @@ public class Turret : MonoBehaviour
 
         if (angle > 0)
         {
-            return angle >= minRightAngle && angle <= maxRightAngle;
+            return angle >= turretSlotData.minRightAngle && angle <= turretSlotData.maxRightAngle;
         } 
         else
         {
-            return angle <= -minLeftAngle && angle >= -maxLeftAngle;
+            return angle <= -turretSlotData.minLeftAngle && angle >= -turretSlotData.maxLeftAngle;
 
         }
     }
@@ -161,22 +160,13 @@ public class Turret : MonoBehaviour
             if (!shotOnTargetOnly)
             {
                 timer = 0;
-                particleSystem.Play();
+                shotController.Shot();
             }
             else if (Quaternion.Angle(transform.rotation, Quaternion.LookRotation(directionToEnemy, Vector3.up)) == 0)
             {
                 timer = 0;
-                particleSystem.Play();
+                shotController.Shot();
             }
-        }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        if (showDebug)
-        {
-            Debug.DrawArc(-maxRightAngle, -minRightAngle, transform.position, Quaternion.LookRotation(transform.forward, Vector3.up), range, Color.blue, false, true);
-            Debug.DrawArc(minLeftAngle, maxLeftAngle, transform.position, Quaternion.LookRotation(transform.forward, Vector3.up), range, Color.blue, false, true);
         }
     }
 }

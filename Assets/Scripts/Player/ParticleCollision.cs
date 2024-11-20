@@ -5,10 +5,16 @@ using UnityEngine;
 
 public class ParticleCollision : MonoBehaviour
 {
-    [SerializeField]
-    private ParticleSystem particleSystem;
+    [SerializeField] private ParticleSystem particleSystem;
+    [SerializeField] private AudioPlayer audioPlayer;
 
     private float damage;
+
+    public void Shot()
+    {
+        particleSystem.Play();
+        audioPlayer.Play();
+    }
 
     public void SetUp(float damage)
     {
@@ -19,7 +25,16 @@ public class ParticleCollision : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            EnemyManager.Instance.GetEnemy(other.name).DealDamage(damage);
+            Enemy enemy = EnemyManager.Instance.GetEnemy(other.name);
+
+            if (enemy == null)
+            {
+                return;
+            }
+
+            Debug.Log("DAMAGE " + damage);
+
+            enemy.DealDamage(damage);
         }
     }
 }

@@ -7,6 +7,8 @@ public class Enemy : PoolObject
 {
     [SerializeField] private int damage;
     [SerializeField] private int maxHp;
+    [Range(0,1)]
+    [SerializeField] private float pointDropChance;
     private float hp;
 
     [Header("Movement")]
@@ -22,7 +24,7 @@ public class Enemy : PoolObject
 
     [Header("Componets")]
     [SerializeField] private Rigidbody enemyRigidbody;
-    [SerializeField] private TrailRenderer trail;
+    [SerializeField] private ParticleController particleOnDeath;
 
     private Coroutine movementCoroutine;
 
@@ -43,8 +45,7 @@ public class Enemy : PoolObject
 
     private IEnumerator Movement()
     {
-        float time = refreshTargetTime;
-        float timer = time;
+        float timer = refreshTargetTime;
 
         float waitTimer = waitTime;
 
@@ -58,7 +59,7 @@ public class Enemy : PoolObject
         {
             timer += Time.fixedDeltaTime;
 
-            if (timer >= time)
+            if (timer >= refreshTargetTime)
             {
                 if (waitTimer < waitTime)
                 {
@@ -72,7 +73,6 @@ public class Enemy : PoolObject
 
                 oldDirection = enemyRigidbody.linearVelocity.normalized * speed;
                 moveDirection = Quaternion.AngleAxis(Random.Range(-rotationDegrees, rotationDegrees), Vector3.forward) * GetPlayerDirection() * speed;
-
                 timer = 0;
                 waitTimer = 0;
                 trackingProgress = 0;
@@ -91,6 +91,8 @@ public class Enemy : PoolObject
                 enemyRigidbody.linearVelocity = moveDirection;
             }
 
+            transform.rotation = Quaternion.LookRotation(enemyRigidbody.linearVelocity.normalized, Vector3.up);
+
             yield return wait;
         }
     }
@@ -99,31 +101,28 @@ public class Enemy : PoolObject
     {
         hp -= damage;
 
-        Debug.Log(hp);
-
         if (hp <= 0)
         {
-            EnemyManager.Instance.SpawnPoint(transform.position);
+            ParticleController particleController = PoolController.Instance.GetObject<ParticleController>(particleOnDeath);
+            particleController.transform.position = transform.position;
+            particleController.Play(true);
+
+            if (Random.Range(0f, 1f) < pointDropChance)
+            {
+                EnemyManager.Instance.SpawnPoint(transform.position);
+            }
             EnemyManager.Instance.RemoveEnemy(this);
         }
-    }
-
-    public void ResetTrail()
-    {
-        trail.Clear();
     }
 
     public override void OnTakenFromPool()
     {
         gameObject.SetActive(true);
         hp = maxHp;
-        trail.transform.SetParent(transform);
-        StartMovement();
     }
 
     public override void OnReturnToPool()
     {
-        trail.transform.SetParent(null);
         enemyRigidbody.linearVelocity = Vector3.zero;
         enemyRigidbody.angularVelocity = Vector3.zero;
         StopCoroutine(movementCoroutine);
@@ -134,6 +133,10 @@ public class Enemy : PoolObject
     {
         if (other.CompareTag("Player"))
         {
+            ParticleController particleController = PoolController.Instance.GetObject<ParticleController>(particleOnDeath);
+            particleController.transform.position = transform.position;
+            particleController.Play(true);
+
             Player.Instance.DealDamage(damage);
             EnemyManager.Instance.RemoveEnemy(this);
         }

@@ -12,9 +12,12 @@ public class EngineParticles : MonoBehaviour
     public List<ParticleSystem> backRightEngines;
     public List<ParticleSystem> backLeftEngines;
 
+    public AudioSource forwardEngineSound;
+    public AudioSource backEngineSound;
+
     public enum Engine
     {
-        MAIN_BACK, 
+        MAIN_BACK,
         MAIN_FORWARD,
         SIDE_FORWARD_RIGHT,
         SIDE_FORWARD_LEFT,
@@ -66,7 +69,7 @@ public class EngineParticles : MonoBehaviour
 
     public void ActivateSideEngines(bool[,] sideEngines)
     {
-        ChangeEngineStatus(EngineParticles.Engine.SIDE_FORWARD_LEFT, sideEngines[0,0]);
+        ChangeEngineStatus(EngineParticles.Engine.SIDE_FORWARD_LEFT, sideEngines[0, 0]);
         ChangeEngineStatus(EngineParticles.Engine.SIDE_FORWARD_RIGHT, sideEngines[0, 1]);
         ChangeEngineStatus(EngineParticles.Engine.SIDE_BACK_LEFT, sideEngines[1, 0]);
         ChangeEngineStatus(EngineParticles.Engine.SIDE_BACK_RIGHT, sideEngines[1, 1]);
@@ -118,7 +121,7 @@ public class EngineParticles : MonoBehaviour
             if (isOn)
             {
                 engineParticle.Play();
-            } 
+            }
             else
             {
                 engineParticle.Stop();

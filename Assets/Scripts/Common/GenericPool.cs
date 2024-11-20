@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.Pool;
+using Object = UnityEngine.Object;
 
 public class GenericPool
 {
@@ -26,6 +28,8 @@ public class GenericPool
     private PoolObject CreatePooledItem()
     {
         PoolObject poolObject = Object.Instantiate(objectToSpawn);
+
+        poolObject.name = Guid.NewGuid().ToString();
 
         return poolObject;
     }
