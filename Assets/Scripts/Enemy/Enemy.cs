@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -71,8 +70,8 @@ public class Enemy : PoolObject
                     continue;
                 }
 
-                oldDirection = enemyRigidbody.linearVelocity.normalized * speed;
-                moveDirection = Quaternion.AngleAxis(Random.Range(-rotationDegrees, rotationDegrees), Vector3.forward) * GetPlayerDirection() * speed;
+                oldDirection = enemyRigidbody.linearVelocity.normalized * (speed * Player.playerMods.enemySpeedMod);
+                moveDirection = Quaternion.AngleAxis(Random.Range(-rotationDegrees, rotationDegrees), Vector3.forward) * GetPlayerDirection() * (speed * Player.playerMods.enemySpeedMod);
                 timer = 0;
                 waitTimer = 0;
                 trackingProgress = 0;

@@ -9,6 +9,6 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
-        GameController.Instance.SetPause(false);
+        GameController.Instance.TogglePauseMenu(false);
     }
 }

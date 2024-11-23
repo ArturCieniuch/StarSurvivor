@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Threading;
-using Unity.Cinemachine;
-using UnityEditor.Rendering.LookDev;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
+using static Delegates;
 
 public class Player : MonoBehaviour
 {
@@ -15,21 +13,21 @@ public class Player : MonoBehaviour
 
     public int pointRange;
 
-    public UnityEvent<int, int> onHpChange;
-    public UnityEvent<int, int> onExChange;
-    public UnityEvent<int> onLevelChange;
+    public OnMeterChange onHpChange;
+    public OnMeterChange onExChange;
+    public OnValueChange onLevelChange;
 
     private int pointToLevel = 5;
     private int level = 1;
     public CameraShake cameraShake;
     public ParticleController particlesOnPlayerDeath;
+    public TurretSlotSelection turretSlotSelection;
 
+    public static PlayerMods playerMods;
 
     void Awake()
     {
-        onHpChange = new UnityEvent<int, int>();
-        onExChange = new UnityEvent<int, int>();
-        onLevelChange = new UnityEvent<int>();
+        playerMods = new PlayerMods();
         Instance = this;
         hp = maxHp;
         points = 0;
@@ -43,17 +41,22 @@ public class Player : MonoBehaviour
         {
             points -= pointToLevel;
             level++;
-            onLevelChange.Invoke(level);
+            onLevelChange?.Invoke(level);
             pointToLevel += 10;
+
+            if (level <= 7)
+            {
+                GameController.Instance.OnLevelUp();
+            }
         }
 
-        onExChange.Invoke(points, pointToLevel);
+        onExChange?.Invoke(points, pointToLevel);
     }
 
     public void DealDamage(int damage)
     {
         hp -= damage;
-        onHpChange.Invoke(hp, maxHp);
+        onHpChange?.Invoke(hp, maxHp);
 
         cameraShake.ShakeCamera();
 
@@ -66,4 +69,17 @@ public class Player : MonoBehaviour
             gameObject.SetActive(false);
         }
     }
+}
+
+[Serializable]
+public class PlayerMods
+{
+    public float maxVelocityMod = 1;
+    public float accelerationMod = 1;
+    public float sideAccelerationMod = 1;
+    public float maxSideAccelerationMod = 1;
+    public float hpMod = 1;
+    public float enemySpeedMod = 1;
+    public float turretsFireRateMod = 1;
+    public float turretsDamageMod = 1;
 }

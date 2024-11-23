@@ -1,20 +1,49 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Random = UnityEngine.Random;
 
-public class AudioPlayer : MonoBehaviour
+public class AudioPlayer : PoolObject
 {
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private float basePitch;
-    [SerializeField] private float pitchOffset;
-
-    [SerializeField] private List<AudioClip> clips;
-
-    public void Play()
+    public void Play(SoundDataSO soundData)
     {
-        audioSource.pitch = basePitch + Random.Range(-pitchOffset, pitchOffset);
+        gameObject.name = soundData.name;
 
-        audioSource.clip = clips[Random.Range(0, clips.Count)];
+        if (audioSource.isPlaying)
+        {
+            return;
+        }
 
+        audioSource.volume = soundData.volume;
+
+        audioSource.pitch = soundData.basePitch + Random.Range(-soundData.pitchOffset, soundData.pitchOffset);
+
+        audioSource.clip = soundData.clips[Random.Range(0, soundData.clips.Count)];
+
+        audioSource.loop = soundData.loop;
         audioSource.Play();
+    }
+
+    private void Update()
+    {
+        if (audioSource.loop || audioSource.isPlaying)
+        {
+            return;
+        }
+
+        AudioManager.ReturnSound(this);
+    }
+
+    public override void OnTakenFromPool()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public override void OnReturnToPool()
+    {
+        gameObject.SetActive(false);
+        audioSource.Stop();
     }
 }

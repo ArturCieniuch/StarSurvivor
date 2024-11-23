@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using Redcode.Moroutines;
 using UnityEngine;
@@ -14,6 +13,10 @@ public class GameController : MonoBehaviour
 
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject deathMenu;
+    [SerializeField] private GameObject levelUpMenu;
+    [SerializeField] private AudioSource music;
+    [SerializeField] private AudioSource deathMusic;
+
 
     private InputAction pauseAction;
 
@@ -21,33 +24,43 @@ public class GameController : MonoBehaviour
     {
         Instance = this;
         pauseAction = InputSystem.actions.FindAction("Pause");
+        music.ignoreListenerPause = true;
+        deathMusic.ignoreListenerPause = true;
     }
 
     public void SetPause(bool pause)
     {
         IsPaused = pause;
         Time.timeScale = pause ? 0f : 1f;
-
-        if (!deathMenu.activeInHierarchy)
-        {
-            pauseMenu.SetActive(pause);
-        }
-
         AudioListener.pause = pause;
+    }
+
+    public void TogglePauseMenu(bool enable)
+    {
+        SetPause(enable);
+        pauseMenu.SetActive(enable);
     }
 
     private void Update()
     {
         if (pauseAction.WasPressedThisFrame())
         {
-            SetPause(!IsPaused);
+            TogglePauseMenu(!IsPaused);
         }
+    }
+
+    public void OnLevelUp()
+    {
+        SetPause(true);
+        levelUpMenu.SetActive(true);
     }
 
     public void OnPlayerDeath()
     {
         IsPaused = false;
         isDead = true;
+        music.Stop();
+        deathMusic.Play();
         Moroutine.Run(DeathCoroutine());
     }
 

@@ -8,12 +8,18 @@ public class CountersUi : MonoBehaviour
     public Image hpBar;
     public Image exBar;
     public TextMeshProUGUI levelText;
+    public TextMeshProUGUI timeText;
 
     private void Start()
     {
-        Player.Instance.onHpChange.AddListener(UpdateHp);
-        Player.Instance.onExChange.AddListener(UpdateEx);
-        Player.Instance.onLevelChange.AddListener(UpdateLevel);
+        Player.Instance.onHpChange += UpdateHp;
+        Player.Instance.onExChange += UpdateEx;
+        Player.Instance.onLevelChange += UpdateLevel;
+    }
+
+    private void Update()
+    {
+        timeText.text = TimeSpan.FromSeconds(Time.timeSinceLevelLoad).ToString(@"mm\:ss");
     }
 
     private void UpdateHp(int hp, int maxHp)

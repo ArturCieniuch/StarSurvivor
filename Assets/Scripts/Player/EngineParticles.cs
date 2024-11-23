@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
 
 public class EngineParticles : MonoBehaviour
@@ -11,9 +9,6 @@ public class EngineParticles : MonoBehaviour
     public List<ParticleSystem> forwardLeftEngines;
     public List<ParticleSystem> backRightEngines;
     public List<ParticleSystem> backLeftEngines;
-
-    public AudioSource forwardEngineSound;
-    public AudioSource backEngineSound;
 
     public enum Engine
     {

@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using static Delegates;
 using Random = UnityEngine.Random;
 
 public class EnemyManager : MonoBehaviour
@@ -10,6 +10,9 @@ public class EnemyManager : MonoBehaviour
 
     [Header("Spawn Info")]
     public Enemy enemyToSpawn;
+    public Enemy enemyToSpawnFast;
+    public Enemy enemyToSpawnBig;
+
     public Point pointPrefab;
     public int timeBetweenSpawns;
     public int enemiesInSpawnWave;
@@ -28,7 +31,7 @@ public class EnemyManager : MonoBehaviour
     private float timer;
     private float difficultyTimer;
 
-    public UnityEvent<Enemy> enemyRemoved;
+    public OnEnemy enemyRemoved;
 
     private void Awake()
     {
@@ -44,7 +47,27 @@ public class EnemyManager : MonoBehaviour
         {
             for (int i = 0; i < enemiesInSpawnWave; i++)
             {
-                SpawnEnemy();
+                if (i < 8)
+                {
+                    SpawnEnemy(enemyToSpawn);
+                } 
+                else
+                {
+                    float value = Random.Range(0f, 1f);
+
+                    if (value < 0.5f)
+                    {
+                        SpawnEnemy(enemyToSpawn);
+                    }
+                    else if (value < 0.75f)
+                    {
+                        SpawnEnemy(enemyToSpawnBig);
+                    }
+                    else
+                    {
+                        SpawnEnemy(enemyToSpawnFast);
+                    }
+                }
             }
 
             timer = 0;
@@ -61,7 +84,7 @@ public class EnemyManager : MonoBehaviour
 
     }
 
-    private void SpawnEnemy()
+    private void SpawnEnemy(Enemy enemyPrefab)
     {
         if (enemies.Count >= maxEnemies)
         {
@@ -73,10 +96,8 @@ public class EnemyManager : MonoBehaviour
         Vector2 point = Random.insideUnitCircle.normalized * Random.Range(minDistanceToPlayer, maxDistanceToPlayer);
         Vector3 enemyPosition = new Vector3(point.x + playerPosition.x, 0, point.y + playerPosition.z + transform.position.z);
 
-        Enemy enemy = PoolController.Instance.GetObject<Enemy>(enemyToSpawn);
+        Enemy enemy = PoolController.Instance.GetObject<Enemy>(enemyPrefab);
         enemy.transform.position = enemyPosition;
-        //Vector3 direction = (enemyPosition - playerPosition).normalized;
-        //enemy.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
 
         enemy.StartMovement();
 
@@ -85,7 +106,7 @@ public class EnemyManager : MonoBehaviour
 
     public void RemoveEnemy(Enemy enemyToRemove)
     {
-        enemyRemoved.Invoke(enemyToRemove);
+        enemyRemoved?.Invoke(enemyToRemove);
         enemies.Remove(enemyToRemove.name);
         PoolController.Instance.ReturnObject(enemyToRemove);
     }

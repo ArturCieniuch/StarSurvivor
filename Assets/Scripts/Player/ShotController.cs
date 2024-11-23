@@ -7,22 +7,32 @@ public class ShotController : MonoBehaviour
     private List<ParticleCollision> particles;
 
     [SerializeField] private bool volleyFire;
+    [SerializeField] private SoundDataSO soundData;
 
     private int index;
 
-    public void SetUp(float damagePerShot)
-    {
-        float damage = damagePerShot;
+    private Turret parentTurret;
 
-        if (volleyFire)
-        {
-            damage = damagePerShot / particles.Count;
-        }
+    public void SetUp(Turret parentTurret)
+    {
+        this.parentTurret = parentTurret;
 
         foreach (var particle in particles)
         {
-            particle.SetUp(damage);
+            particle.OnHit += OnHit;
         }
+    }
+
+    private float GetDamage()
+    {
+        float damage = parentTurret.GetDamage();
+
+        if (volleyFire)
+        {
+            damage /= particles.Count;
+        }
+
+        return damage;
     }
 
     public void Shot()
@@ -32,6 +42,7 @@ public class ShotController : MonoBehaviour
             foreach (var particle in particles)
             {
                 particle.Shot();
+                AudioManager.PlaySound(soundData, transform.position);
             }
 
             return;
@@ -43,5 +54,23 @@ public class ShotController : MonoBehaviour
         }
 
         particles[index++].Shot();
+        AudioManager.PlaySound(soundData, transform.position);
+    }
+
+    private void OnHit(GameObject other)
+    {
+        if (!other.CompareTag("Enemy"))
+        {
+            return;
+        }
+
+        Enemy enemy = EnemyManager.Instance.GetEnemy(other.name);
+
+        if (enemy == null)
+        {
+            return;
+        }
+
+        enemy.DealDamage(GetDamage());
     }
 }

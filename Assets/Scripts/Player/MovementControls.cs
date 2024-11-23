@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEngine.ParticleSystem;
 
 public class MovementControls : MonoBehaviour
 {
@@ -16,6 +15,10 @@ public class MovementControls : MonoBehaviour
 
     private InputAction moveAction;
     private InputAction rotateAction;
+
+    [SerializeField] private float mainEnginesMaxVolume = 0.2f;
+    [SerializeField] private AudioSource forwardEngineSound;
+    [SerializeField] private AudioSource backEngineSound;
 
     void Start()
     {
@@ -35,14 +38,24 @@ public class MovementControls : MonoBehaviour
 
         if (moveVector2.y > 0)
         {
-            localVelocity += Vector3.forward * (acceleration * Time.deltaTime);
+            localVelocity += Vector3.forward * (acceleration * Time.deltaTime * Player.playerMods.accelerationMod);
             enginesEffect.FullForward();
+
+            if (backEngineSound.volume < mainEnginesMaxVolume)
+            {
+                backEngineSound.volume += 1f * Time.deltaTime;
+            }
         }
 
         if (moveVector2.y < 0)
         {
-            localVelocity -= Vector3.forward * (acceleration * Time.deltaTime);
+            localVelocity -= Vector3.forward * (acceleration * Time.deltaTime * Player.playerMods.accelerationMod);
             enginesEffect.FullBackward();
+
+            if (forwardEngineSound.volume < mainEnginesMaxVolume)
+            {
+                forwardEngineSound.volume += 1f * Time.deltaTime;
+            }
         }
 
         if (moveVector2.y == 0)
@@ -52,20 +65,16 @@ public class MovementControls : MonoBehaviour
 
         if (moveVector2.x > 0)
         {
-            localVelocity += Vector3.right * (sideAcceleration * Time.deltaTime);
+            localVelocity += Vector3.right * (sideAcceleration * Time.deltaTime * Player.playerMods.sideAccelerationMod);
             sideEngines[0, 0] = true;
             sideEngines[1, 0] = true;
-
-            //enginesEffect.MoveRight();
         }
 
         if (moveVector2.x < 0)
         {
-            localVelocity += -Vector3.right * (sideAcceleration * Time.deltaTime);
+            localVelocity += -Vector3.right * (sideAcceleration * Time.deltaTime * Player.playerMods.sideAccelerationMod);
             sideEngines[0, 1] = true;
             sideEngines[1, 1] = true;
-
-            //enginesEffect.MoveLeft();
         }
 
         if (rotationAxis != 0)
@@ -74,15 +83,11 @@ public class MovementControls : MonoBehaviour
             {
                 sideEngines[0, 1] = true;
                 sideEngines[1, 0] = true;
-
-                //enginesEffect.RotateLeft();
             }
             else
             {
                 sideEngines[0, 0] = true;
                 sideEngines[1, 1] = true;
-
-                //enginesEffect.RotateRight();
             }
 
             transform.Rotate(Vector3.up, rotationAxis * rotationSpeed * Time.deltaTime);
@@ -92,22 +97,32 @@ public class MovementControls : MonoBehaviour
 
         if (moveVector2.x == 0)
         {
-            localVelocity.x = Mathf.MoveTowards(localVelocity.x, 0, sideAcceleration * Time.deltaTime);
+            localVelocity.x = Mathf.MoveTowards(localVelocity.x, 0, sideAcceleration * Time.deltaTime * Player.playerMods.sideAccelerationMod);
         }
 
         if (moveVector2.y == 0)
         {
-            localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0, acceleration * Time.deltaTime);
+            localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0, acceleration * Time.deltaTime * Player.playerMods.accelerationMod);
+
+            if (backEngineSound.volume > 0)
+            {
+                backEngineSound.volume -= 1f * Time.deltaTime;
+            }
+
+            if (forwardEngineSound.volume > 0)
+            {
+                forwardEngineSound.volume -= 1f * Time.deltaTime;
+            }
         }
 
-        if (Mathf.Abs(localVelocity.x) > maxSideAcceleration)
+        if (Mathf.Abs(localVelocity.x) > maxSideAcceleration * Player.playerMods.maxSideAccelerationMod)
         {
-            localVelocity.x = maxSideAcceleration * Mathf.Sign(localVelocity.x);
+            localVelocity.x = maxSideAcceleration * Player.playerMods.maxSideAccelerationMod * Mathf.Sign(localVelocity.x);
         }
 
-        if (Mathf.Abs(localVelocity.z) > maxVelocity)
+        if (Mathf.Abs(localVelocity.z) > maxVelocity * Player.playerMods.maxVelocityMod)
         {
-            localVelocity.z = maxVelocity * Mathf.Sign(localVelocity.z);
+            localVelocity.z = maxVelocity * Player.playerMods.maxVelocityMod * Mathf.Sign(localVelocity.z);
         }
 
         rigidbody.linearVelocity = transform.TransformDirection(localVelocity);

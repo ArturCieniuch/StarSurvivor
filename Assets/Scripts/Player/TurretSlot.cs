@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class TurretSlot : MonoBehaviour
 {
@@ -19,6 +18,16 @@ public class TurretSlot : MonoBehaviour
     [SerializeField] private Vector3 turretOffset;
     [SerializeField] private bool showDebug;
 
+    public TurretSlotData GetSlotData => turretSlotData;
+    public Turret GetTurret => turret;
+
+    public void SetUpTurret(TurretDataSO turretData)
+    {
+        turret = Instantiate(turretData.prefab, transform);
+        turret.transform.localPosition = turretOffset;
+        turret.SetTurretSlotData(turretSlotData);
+    }
+
     void Start()
     {
         if (turret)
@@ -26,7 +35,6 @@ public class TurretSlot : MonoBehaviour
             turret.SetTurretSlotData(turretSlotData);
         }
     }
-
     private void OnDrawGizmosSelected()
     {
         if (showDebug)

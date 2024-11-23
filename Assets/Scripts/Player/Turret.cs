@@ -1,20 +1,11 @@
-using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.Audio;
-using UnityEngine.Rendering;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class Turret : MonoBehaviour
 {
     private List<Enemy> enemies;
 
-    [SerializeField] private float rotationSpeed = 5;
-    [SerializeField] private float fireRate;
-    [SerializeField] private float damagePerSecond;
-    [SerializeField] private float range;
-    [SerializeField] private bool shotOnTargetOnly;
+    [SerializeField] private TurretDataSO turretData;
 
     private TurretSlot.TurretSlotData turretSlotData;
 
@@ -26,13 +17,20 @@ public class Turret : MonoBehaviour
 
     private float timer;
 
+    public TurretDataSO GetTurretData => turretData;
+
     private void Start()
     {
-        EnemyManager.Instance.enemyRemoved.AddListener(OnEnemyRemoved);
+        EnemyManager.Instance.enemyRemoved += OnEnemyRemoved;
         enemies = new List<Enemy>(EnemyManager.Instance.maxEnemies);
-        shotController.SetUp(damagePerSecond / fireRate);
-        trigger.radius = range;
+        shotController.SetUp(this);
+        trigger.radius = turretData.range;
         angleTracker.SetParent(Player.Instance.transform);
+    }
+
+    public float GetDamage()
+    {
+        return (turretData.damagePerSecond / turretData.fireRate) * Player.playerMods.turretsDamageMod;
     }
 
     private void OnEnemyRemoved(Enemy enemy)
@@ -107,7 +105,7 @@ public class Turret : MonoBehaviour
 
     private bool CheckAngleAndDistance(Transform enemyTransform)
     {
-        if (Vector3.Distance(enemyTransform.position, transform.position) > range)
+        if (Vector3.Distance(enemyTransform.position, transform.position) > turretData.range)
         {
             return false;
         }
@@ -145,19 +143,19 @@ public class Turret : MonoBehaviour
 
         if (closestEnemy == null)
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(GetTrackerDirection()), rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(GetTrackerDirection()), turretData.rotationSpeed * Time.deltaTime);
             return;
         }
 
         Vector3 directionToEnemy = (closestEnemy.transform.position - transform.position).normalized;
         directionToEnemy.y = 0;
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(directionToEnemy, Vector3.up), rotationSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(directionToEnemy, Vector3.up), turretData.rotationSpeed * Time.deltaTime);
 
-        float realFireRate = 1f / fireRate;
+        float realFireRate = 1f / (turretData.fireRate * Player.playerMods.turretsFireRateMod);
 
         if (timer >= realFireRate)
         {
-            if (!shotOnTargetOnly)
+            if (!turretData.shotOnTargetOnly)
             {
                 timer = 0;
                 shotController.Shot();

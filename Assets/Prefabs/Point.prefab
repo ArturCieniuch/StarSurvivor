@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bc2a2fdc2947f04dbd0cdab36764d94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectName: point
+  objectName: Point
   pointValue: 2
   startSpeed: 1
   accelerationPerSecond: 1.1
