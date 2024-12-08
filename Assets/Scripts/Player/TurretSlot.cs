@@ -21,11 +21,18 @@ public class TurretSlot : MonoBehaviour
     public TurretSlotData GetSlotData => turretSlotData;
     public Turret GetTurret => turret;
 
-    public void SetUpTurret(TurretDataSO turretData)
+    public void SetUpTurret(Turret turret)
     {
-        turret = Instantiate(turretData.prefab, transform);
-        turret.transform.localPosition = turretOffset;
-        turret.SetTurretSlotData(turretSlotData);
+        if (this.turret != null)
+        {
+            this.turret.LevelUp();
+            return;
+        }
+
+        this.turret = Instantiate(turret, transform);
+        this.turret.name = turret.name;
+        this.turret.transform.localPosition = turretOffset;
+        this.turret.SetTurretSlotData(turretSlotData);
     }
 
     void Start()

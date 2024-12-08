@@ -48,9 +48,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectName: Enemy
-  damage: 2
+  damage: 20
   maxHp: 5
-  pointDropChance: 0.5
+  dropTable: {fileID: 11400000, guid: 028a06f64fbe0ee40b42926e9a6201c6, type: 2}
   speed: 5
   waitTime: 0
   refreshTargetTime: 0

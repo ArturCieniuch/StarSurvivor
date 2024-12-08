@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class CountersUi : MonoBehaviour
 {
     public Image hpBar;
+    public TextMeshProUGUI hpText;
     public Image exBar;
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI timeText;
@@ -25,6 +26,7 @@ public class CountersUi : MonoBehaviour
     private void UpdateHp(int hp, int maxHp)
     {
         hpBar.fillAmount = (float)hp/maxHp;
+        hpText.text = $"{hp}/{maxHp}";
     }
 
     private void UpdateEx(int points, int pointToLevel)

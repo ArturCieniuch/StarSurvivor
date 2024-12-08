@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -21,6 +22,9 @@ public class EnemyManager : MonoBehaviour
     public float timeBetweenChange;
     public int difficultyChange;
 
+    [Header("Drops")] public List<Drop> drops;
+    private Dictionary<DropType, Drop> dropsDictionary;
+
     [Header("Distance")]
     public int minDistanceToPlayer;
     public int maxDistanceToPlayer;
@@ -38,6 +42,13 @@ public class EnemyManager : MonoBehaviour
         Instance = this;
         enemies = new Dictionary<string, Enemy>(maxEnemies);
         timer = timeBetweenSpawns;
+
+        dropsDictionary = new Dictionary<DropType, Drop>(drops.Count);
+
+        foreach (var drop in drops)
+        {
+            dropsDictionary.Add(drop.dropType, drop);
+        }
     }
 
     // Update is called once per frame
@@ -53,7 +64,7 @@ public class EnemyManager : MonoBehaviour
                 } 
                 else
                 {
-                    float value = Random.Range(0f, 1f);
+                    double value = GameController.Rand.NextDouble();
 
                     if (value < 0.5f)
                     {
@@ -93,7 +104,7 @@ public class EnemyManager : MonoBehaviour
 
         Vector3 playerPosition = Player.Instance.transform.position;
 
-        Vector2 point = Random.insideUnitCircle.normalized * Random.Range(minDistanceToPlayer, maxDistanceToPlayer);
+        Vector2 point = Random.insideUnitCircle.normalized * GameController.Rand.Next(minDistanceToPlayer, maxDistanceToPlayer);
         Vector3 enemyPosition = new Vector3(point.x + playerPosition.x, 0, point.y + playerPosition.z + transform.position.z);
 
         Enemy enemy = PoolController.Instance.GetObject<Enemy>(enemyPrefab);
@@ -111,15 +122,21 @@ public class EnemyManager : MonoBehaviour
         PoolController.Instance.ReturnObject(enemyToRemove);
     }
 
-    public void SpawnPoint(Vector3 position)
+    public void EnemyDrop(Vector3 position, DropData dropData)
     {
-        Point point = PoolController.Instance.GetObject<Point>(pointPrefab);
-        point.transform.position = position;
+        if (dropData.dropType == DropType.EMPTY)
+        {
+            return;
+        }
+
+        Drop drop = dropsDictionary[dropData.dropType];
+        Drop newDrop = PoolController.Instance.GetObject<Drop>(drop);
+        newDrop.transform.position = position;
     }
 
-    public void ReturnPoint(Point pointToReturn)
+    public void ReturnDrop(Drop drop)
     {
-        PoolController.Instance.ReturnObject(pointToReturn);
+        PoolController.Instance.ReturnObject(drop);
     }
 
     public Enemy GetEnemy(string name)

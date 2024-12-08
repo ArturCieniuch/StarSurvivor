@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1231247397421809293}
   - component: {fileID: 6737373092427717309}
   - component: {fileID: 468193251416496668}
-  - component: {fileID: 3899681174870425361}
   m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
@@ -87,27 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3899681174870425361
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 201204308674950765}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &657674778343554289
 GameObject:
   m_ObjectHideFlags: 0
@@ -5023,9 +5001,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particleSystem: {fileID: 1873949341509598330}
-  OnHit:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1767012095046686120
 GameObject:
   m_ObjectHideFlags: 0
@@ -5037,7 +5012,6 @@ GameObject:
   - component: {fileID: 3652531319435439396}
   - component: {fileID: 2648542718280395892}
   - component: {fileID: 7359475606694368511}
-  - component: {fileID: 6835985538474959939}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
@@ -5113,27 +5087,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6835985538474959939
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1767012095046686120}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2774544935887070333
 GameObject:
   m_ObjectHideFlags: 0
@@ -10170,11 +10123,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 492e0941dbd200b438feb87710e1ab98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turretData: {fileID: 11400000, guid: 2777fe01d0a85c34ab9fc7e0dfad788e, type: 2}
+  icon: {fileID: -367584904, guid: 6458e775fe7446c49b61f9727f81450d, type: 3}
+  rarity: 0
+  levels:
+  - rotationSpeed: 360
+    fireRate: 1
+    damagePerSecond: 5
+    range: 25
+    shotOnTargetOnly: 1
+  - rotationSpeed: 360
+    fireRate: 1
+    damagePerSecond: 6
+    range: 30
+    shotOnTargetOnly: 1
+  - rotationSpeed: 360
+    fireRate: 1
+    damagePerSecond: 8
+    range: 30
+    shotOnTargetOnly: 1
+  - rotationSpeed: 360
+    fireRate: 1
+    damagePerSecond: 8
+    range: 35
+    shotOnTargetOnly: 1
+  - rotationSpeed: 360
+    fireRate: 2
+    damagePerSecond: 20
+    range: 35
+    shotOnTargetOnly: 1
   shotController: {fileID: 1298135327230879358}
   trigger: {fileID: 7180949112710944045}
   enemyTracker: {fileID: 5594685181580120342}
   angleTracker: {fileID: 2738683201109221434}
+  currentLevel: 0
 --- !u!135 &7180949112710944045
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -10194,5 +10175,5 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 20
+  m_Radius: 30
   m_Center: {x: 0, y: 0, z: 0}

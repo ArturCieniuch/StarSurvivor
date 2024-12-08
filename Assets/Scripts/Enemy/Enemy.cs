@@ -6,8 +6,7 @@ public class Enemy : PoolObject
 {
     [SerializeField] private int damage;
     [SerializeField] private int maxHp;
-    [Range(0,1)]
-    [SerializeField] private float pointDropChance;
+    [SerializeField] private DropTableSO dropTable;
     private float hp;
 
     [Header("Movement")]
@@ -71,7 +70,7 @@ public class Enemy : PoolObject
                 }
 
                 oldDirection = enemyRigidbody.linearVelocity.normalized * (speed * Player.playerMods.enemySpeedMod);
-                moveDirection = Quaternion.AngleAxis(Random.Range(-rotationDegrees, rotationDegrees), Vector3.forward) * GetPlayerDirection() * (speed * Player.playerMods.enemySpeedMod);
+                moveDirection = Quaternion.AngleAxis(GameController.Rand.Next(-rotationDegrees, rotationDegrees), Vector3.forward) * GetPlayerDirection() * (speed * Player.playerMods.enemySpeedMod);
                 timer = 0;
                 waitTimer = 0;
                 trackingProgress = 0;
@@ -106,10 +105,7 @@ public class Enemy : PoolObject
             particleController.transform.position = transform.position;
             particleController.Play(true);
 
-            if (Random.Range(0f, 1f) < pointDropChance)
-            {
-                EnemyManager.Instance.SpawnPoint(transform.position);
-            }
+            EnemyManager.Instance.EnemyDrop(transform.position, dropTable.GetDrop());
             EnemyManager.Instance.RemoveEnemy(this);
         }
     }

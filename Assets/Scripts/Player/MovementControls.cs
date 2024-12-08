@@ -38,7 +38,7 @@ public class MovementControls : MonoBehaviour
 
         if (moveVector2.y > 0)
         {
-            localVelocity += Vector3.forward * (acceleration * Time.deltaTime * Player.playerMods.accelerationMod);
+            localVelocity += Vector3.forward * (acceleration * Time.deltaTime * Player.GetMod(ModType.ACCELERATION));
             enginesEffect.FullForward();
 
             if (backEngineSound.volume < mainEnginesMaxVolume)
@@ -49,7 +49,7 @@ public class MovementControls : MonoBehaviour
 
         if (moveVector2.y < 0)
         {
-            localVelocity -= Vector3.forward * (acceleration * Time.deltaTime * Player.playerMods.accelerationMod);
+            localVelocity -= Vector3.forward * (acceleration * Time.deltaTime * Player.GetMod(ModType.ACCELERATION));
             enginesEffect.FullBackward();
 
             if (forwardEngineSound.volume < mainEnginesMaxVolume)
@@ -65,14 +65,14 @@ public class MovementControls : MonoBehaviour
 
         if (moveVector2.x > 0)
         {
-            localVelocity += Vector3.right * (sideAcceleration * Time.deltaTime * Player.playerMods.sideAccelerationMod);
+            localVelocity += Vector3.right * (sideAcceleration * Time.deltaTime * Player.GetMod(ModType.ACCELERATION));
             sideEngines[0, 0] = true;
             sideEngines[1, 0] = true;
         }
 
         if (moveVector2.x < 0)
         {
-            localVelocity += -Vector3.right * (sideAcceleration * Time.deltaTime * Player.playerMods.sideAccelerationMod);
+            localVelocity += -Vector3.right * (sideAcceleration * Time.deltaTime * Player.GetMod(ModType.ACCELERATION));
             sideEngines[0, 1] = true;
             sideEngines[1, 1] = true;
         }
@@ -90,19 +90,19 @@ public class MovementControls : MonoBehaviour
                 sideEngines[1, 1] = true;
             }
 
-            transform.Rotate(Vector3.up, rotationAxis * rotationSpeed * Time.deltaTime);
+            transform.Rotate(Vector3.up, rotationAxis * rotationSpeed * Player.GetMod(ModType.ROTATION) * Time.deltaTime);
         }
 
         enginesEffect.ActivateSideEngines(sideEngines);
 
         if (moveVector2.x == 0)
         {
-            localVelocity.x = Mathf.MoveTowards(localVelocity.x, 0, sideAcceleration * Time.deltaTime * Player.playerMods.sideAccelerationMod);
+            localVelocity.x = Mathf.MoveTowards(localVelocity.x, 0, sideAcceleration * Time.deltaTime * Player.GetMod(ModType.ACCELERATION));
         }
 
         if (moveVector2.y == 0)
         {
-            localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0, acceleration * Time.deltaTime * Player.playerMods.accelerationMod);
+            localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0, acceleration * Time.deltaTime * Player.GetMod(ModType.ACCELERATION));
 
             if (backEngineSound.volume > 0)
             {
@@ -115,14 +115,14 @@ public class MovementControls : MonoBehaviour
             }
         }
 
-        if (Mathf.Abs(localVelocity.x) > maxSideAcceleration * Player.playerMods.maxSideAccelerationMod)
+        if (Mathf.Abs(localVelocity.x) > maxSideAcceleration * Player.GetMod(ModType.MAX_VELOCITY))
         {
-            localVelocity.x = maxSideAcceleration * Player.playerMods.maxSideAccelerationMod * Mathf.Sign(localVelocity.x);
+            localVelocity.x = maxSideAcceleration * Player.GetMod(ModType.MAX_VELOCITY) * Mathf.Sign(localVelocity.x);
         }
 
-        if (Mathf.Abs(localVelocity.z) > maxVelocity * Player.playerMods.maxVelocityMod)
+        if (Mathf.Abs(localVelocity.z) > maxVelocity * Player.GetMod(ModType.MAX_VELOCITY))
         {
-            localVelocity.z = maxVelocity * Player.playerMods.maxVelocityMod * Mathf.Sign(localVelocity.z);
+            localVelocity.z = maxVelocity * Player.GetMod(ModType.MAX_VELOCITY) * Mathf.Sign(localVelocity.z);
         }
 
         rigidbody.linearVelocity = transform.TransformDirection(localVelocity);

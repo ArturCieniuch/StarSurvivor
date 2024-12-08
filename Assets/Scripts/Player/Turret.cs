@@ -1,13 +1,22 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
-public class Turret : MonoBehaviour
+public class Turret : ShipSystem
 {
-    private List<Enemy> enemies;
+    [Header("Data")]
+    [SerializeField] private List<TurretData> levels = new List<TurretData>(1);
 
-    [SerializeField] private TurretDataSO turretData;
-
-    private TurretSlot.TurretSlotData turretSlotData;
+    [Serializable]
+    public class TurretData
+    {
+        public float rotationSpeed = 360;
+        public float fireRate;
+        public float damagePerSecond;
+        public float range;
+        public bool shotOnTargetOnly;
+    }
 
     [Header("Components")]
     [SerializeField] private ShotController shotController;
@@ -15,22 +24,39 @@ public class Turret : MonoBehaviour
     [SerializeField] private EnemyTracker enemyTracker;
     [SerializeField] private Transform angleTracker;
 
-    private float timer;
 
-    public TurretDataSO GetTurretData => turretData;
+    private List<Enemy> enemies;
+    private TurretSlot.TurretSlotData turretSlotData;
+
+    private float timer;
+    public int currentLevel = 0;
+
+    public int MaxLevel => levels.Count;
 
     private void Start()
     {
         EnemyManager.Instance.enemyRemoved += OnEnemyRemoved;
         enemies = new List<Enemy>(EnemyManager.Instance.maxEnemies);
         shotController.SetUp(this);
-        trigger.radius = turretData.range;
+        trigger.radius = levels[currentLevel].range;
         angleTracker.SetParent(Player.Instance.transform);
+    }
+
+    public void LevelUp()
+    {
+        currentLevel++;
+
+        trigger.radius = levels[currentLevel].range;
     }
 
     public float GetDamage()
     {
-        return (turretData.damagePerSecond / turretData.fireRate) * Player.playerMods.turretsDamageMod;
+        return (levels[currentLevel].damagePerSecond / levels[currentLevel].fireRate) * Player.GetMod(ModType.TURRETS_DAMAGE);
+    }
+
+    public float GetDamage(int level)
+    {
+        return (levels[level].damagePerSecond / levels[level].fireRate) * Player.GetMod(ModType.TURRETS_DAMAGE);
     }
 
     private void OnEnemyRemoved(Enemy enemy)
@@ -41,6 +67,15 @@ public class Turret : MonoBehaviour
     public void SetTurretSlotData(TurretSlot.TurretSlotData data)
     {
         this.turretSlotData = data;
+    }
+
+    public override string GetDescription()
+    {
+        string description = $"Rotation speed: <color=\"green\"><b>{levels[0].rotationSpeed}\u00b0</b></color> per second\n" +
+                      $"Fire Rate: <color=\"green\"><b>{levels[0].fireRate}</b></color> per second\n" +
+                      $"Damage: <color=\"green\"><b>{GetDamage(0)}</b></color>\n" +
+                      $"Range: <color=\"green\"><b>{levels[0].range}</b></color>";
+        return description;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -105,7 +140,7 @@ public class Turret : MonoBehaviour
 
     private bool CheckAngleAndDistance(Transform enemyTransform)
     {
-        if (Vector3.Distance(enemyTransform.position, transform.position) > turretData.range)
+        if (Vector3.Distance(enemyTransform.position, transform.position) > levels[currentLevel].range)
         {
             return false;
         }
@@ -143,19 +178,19 @@ public class Turret : MonoBehaviour
 
         if (closestEnemy == null)
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(GetTrackerDirection()), turretData.rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(GetTrackerDirection()), levels[currentLevel].rotationSpeed * Time.deltaTime);
             return;
         }
 
         Vector3 directionToEnemy = (closestEnemy.transform.position - transform.position).normalized;
         directionToEnemy.y = 0;
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(directionToEnemy, Vector3.up), turretData.rotationSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(directionToEnemy, Vector3.up), levels[currentLevel].rotationSpeed * Time.deltaTime);
 
-        float realFireRate = 1f / (turretData.fireRate * Player.playerMods.turretsFireRateMod);
+        float realFireRate = 1f / (levels[currentLevel].fireRate * Player.GetMod(ModType.TURRETS_FIRE_RATE));
 
         if (timer >= realFireRate)
         {
-            if (!turretData.shotOnTargetOnly)
+            if (!levels[currentLevel].shotOnTargetOnly)
             {
                 timer = 0;
                 shotController.Shot();

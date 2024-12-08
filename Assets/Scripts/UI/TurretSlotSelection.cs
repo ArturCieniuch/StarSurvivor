@@ -5,7 +5,7 @@ public class TurretSlotSelection : MonoBehaviour
 {
     [SerializeField]List<TurretSlotUI> turretSlots = new List<TurretSlotUI>();
 
-    private TurretDataSO turretData;
+    private Turret turret;
 
     private void Start()
     {
@@ -15,16 +15,27 @@ public class TurretSlotSelection : MonoBehaviour
         }
     }
 
-    private void OnSlotSelected(TurretSlot slot)
+    public void Skip()
     {
-        slot.SetUpTurret(turretData);
         GameController.Instance.SetPause(false);
         gameObject.SetActive(false);
     }
 
-    public void SetUp(TurretDataSO turretData)
+    private void OnSlotSelected(TurretSlot slot)
+    {
+        slot.SetUpTurret(turret);
+        GameController.Instance.SetPause(false);
+        gameObject.SetActive(false);
+    }
+
+    public void SetUp(Turret turret)
     {
         gameObject.SetActive(true);
-        this.turretData = turretData;
+        this.turret = turret;
+
+        foreach (var slot in turretSlots)
+        {
+            slot.Init(turret);
+        }
     }
 }

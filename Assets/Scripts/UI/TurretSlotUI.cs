@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -11,6 +12,7 @@ public class TurretSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [SerializeField] private Button button;
     [SerializeField] private Image rightArcImage;
     [SerializeField] private Image leftArcImage;
+    [SerializeField] private TextMeshProUGUI levelText;
 
     public UnityEvent<TurretSlot> OnSlotSelected = new UnityEvent<TurretSlot>();
 
@@ -32,16 +34,31 @@ public class TurretSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         leftArcImage.enabled = false;
     }
 
-    public void OnEnable()
+    public void Init(Turret currentTurret)
     {
+        button.targetGraphic.color = Color.white;
+        button.interactable = true;
+
         if (connectedTurretSlot.GetTurret == null)
         {
+            levelText.text = "";
+            turretIcon.sprite = null;
+            return;
+        }
+
+        levelText.text = $"{connectedTurretSlot.GetTurret.currentLevel + 1}/{connectedTurretSlot.GetTurret.MaxLevel}";
+
+        if (connectedTurretSlot.GetTurret.name == currentTurret.name && connectedTurretSlot.GetTurret.currentLevel < connectedTurretSlot.GetTurret.MaxLevel-1)
+        {
+            button.targetGraphic.color = Color.green;
+            turretIcon.enabled = true;
+            turretIcon.sprite = connectedTurretSlot.GetTurret.icon;
             return;
         }
 
         button.interactable = false;
         turretIcon.enabled = true;
-        turretIcon.sprite = connectedTurretSlot.GetTurret.GetTurretData.turretIcon;
+        turretIcon.sprite = connectedTurretSlot.GetTurret.icon;
     }
 
     public void OnPointerEnter(PointerEventData eventData)

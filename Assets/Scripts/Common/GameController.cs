@@ -2,6 +2,7 @@ using System.Collections;
 using Redcode.Moroutines;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = System.Random;
 
 public class GameController : MonoBehaviour
 {
@@ -20,9 +21,12 @@ public class GameController : MonoBehaviour
 
     private InputAction pauseAction;
 
+    public static Random Rand;
+
     private void Awake()
     {
         Instance = this;
+        Rand = new Random(1312);
         pauseAction = InputSystem.actions.FindAction("Pause");
         music.ignoreListenerPause = true;
         deathMusic.ignoreListenerPause = true;

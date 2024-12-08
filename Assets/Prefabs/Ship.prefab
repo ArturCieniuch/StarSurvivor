@@ -5152,7 +5152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69fc2d692f46a4446bc1c15415b94c6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 30
+  maxHp: 300
   pointRange: 10
   cameraShake: {fileID: 3697031163999009196}
   particlesOnPlayerDeath: {fileID: 1248434050798509072, guid: c36d02712dd843a4ea8bd531eb2e87e7, type: 3}
