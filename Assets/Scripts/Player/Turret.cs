@@ -51,7 +51,7 @@ public class Turret : ShipSystem
 
     public float GetDamage()
     {
-        return (levels[currentLevel].damagePerSecond / levels[currentLevel].fireRate) * Player.GetMod(ModType.TURRETS_DAMAGE);
+        return GetDamage(currentLevel);
     }
 
     public float GetDamage(int level)
