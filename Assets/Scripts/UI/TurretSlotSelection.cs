@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TurretSlotSelection : MonoBehaviour
 {
-    [SerializeField]List<TurretSlotUI> turretSlots = new List<TurretSlotUI>();
+    [SerializeField] List<TurretSlotUI> turretSlots = new List<TurretSlotUI>();
+    [SerializeField] private LevelUpMenu menu;
 
     private Turret turret;
 
@@ -15,6 +17,11 @@ public class TurretSlotSelection : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        SetUp(null);
+    }
+
     public void Skip()
     {
         GameController.Instance.SetPause(false);
@@ -23,6 +30,10 @@ public class TurretSlotSelection : MonoBehaviour
 
     private void OnSlotSelected(TurretSlot slot)
     {
+        if (!turret)
+        {
+            return;
+        }
         slot.SetUpTurret(turret);
         GameController.Instance.SetPause(false);
         gameObject.SetActive(false);
@@ -30,7 +41,6 @@ public class TurretSlotSelection : MonoBehaviour
 
     public void SetUp(Turret turret)
     {
-        gameObject.SetActive(true);
         this.turret = turret;
 
         foreach (var slot in turretSlots)

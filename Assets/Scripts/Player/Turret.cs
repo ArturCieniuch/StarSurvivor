@@ -71,11 +71,30 @@ public class Turret : ShipSystem
 
     public override string GetDescription()
     {
-        string description = $"Rotation speed: <color=\"green\"><b>{levels[0].rotationSpeed}\u00b0</b></color> per second\n" +
-                      $"Fire Rate: <color=\"green\"><b>{levels[0].fireRate}</b></color> per second\n" +
-                      $"Damage: <color=\"green\"><b>{GetDamage(0)}</b></color>\n" +
-                      $"Range: <color=\"green\"><b>{levels[0].range}</b></color>";
+        string description = $"Rotation speed: <color=\"green\"><b>{levels[currentLevel].rotationSpeed}\u00b0</b></color> per second\n" +
+                      $"Fire Rate: <color=\"green\"><b>{levels[currentLevel].fireRate}</b></color> per second\n" +
+                      $"Damage: <color=\"green\"><b>{GetDamage(currentLevel)}</b></color>\n" +
+                      $"Range: <color=\"green\"><b>{levels[currentLevel].range}</b></color>";
         return description;
+    }
+
+    public override string GetLevelUpDescription()
+    {
+        if (currentLevel == MaxLevel-1)
+        {
+            return GetDescription();
+        }
+
+        string description = $"Rotation speed: <color=\"green\"><b>{GetLevelUpText(levels[currentLevel].rotationSpeed, levels[currentLevel+1].rotationSpeed)}\u00b0</b></color> per second\n" +
+                             $"Fire Rate: <color=\"green\"><b>{GetLevelUpText(levels[currentLevel].fireRate, levels[currentLevel + 1].fireRate)}</b></color> per second\n" +
+                             $"Damage: <color=\"green\"><b>{GetLevelUpText(GetDamage(currentLevel), GetDamage(currentLevel+1))}</b></color>\n" +
+                             $"Range: <color=\"green\"><b>{GetLevelUpText(levels[currentLevel].range, levels[currentLevel + 1].range)}</b></color>";
+        return description;
+    }
+
+    private string GetLevelUpText(float currentValue, float levelUpValue)
+    {
+        return currentValue != levelUpValue ? $"{currentValue} => {levelUpValue}" : $"{currentValue}";
     }
 
     private void OnTriggerEnter(Collider other)
@@ -155,7 +174,7 @@ public class Turret : ShipSystem
         if (angle > 0)
         {
             return angle >= turretSlotData.minRightAngle && angle <= turretSlotData.maxRightAngle;
-        } 
+        }
         else
         {
             return angle <= -turretSlotData.minLeftAngle && angle >= -turretSlotData.maxLeftAngle;

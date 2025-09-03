@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using static Turret;
 
 public class LevelUpMenu : MonoBehaviour
 {
@@ -8,6 +10,7 @@ public class LevelUpMenu : MonoBehaviour
     [SerializeField] private List<ShipSystem> systemLevelUps;
     [SerializeField] private List<UpgradeDataSO> upgradeLevelUps;
     [SerializeField] private Transform cardContainer;
+    [SerializeField] private TextMeshProUGUI levelUpDescription;
 
     private List<LevelUpCard> cards = new List<LevelUpCard>(3);
 
@@ -15,6 +18,8 @@ public class LevelUpMenu : MonoBehaviour
     {
         List<ShipSystem> shipSystemCards = new List<ShipSystem>();
         List<UpgradeDataSO> updageCards = new List<UpgradeDataSO>();
+
+        Player.Instance.turretSlotSelection.gameObject.SetActive(true);
 
         shipSystemCards.AddRange(GetLevelUps(weaponLevelUps, 1));
         shipSystemCards.AddRange(GetLevelUps(systemLevelUps, 1));

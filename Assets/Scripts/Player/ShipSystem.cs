@@ -9,4 +9,9 @@ public class ShipSystem : MonoBehaviour, ILevelUpDescription
     {
         throw new System.NotImplementedException();
     }
+
+    public virtual string GetLevelUpDescription()
+    {
+        throw new System.NotImplementedException();
+    }
 }

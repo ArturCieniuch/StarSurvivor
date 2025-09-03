@@ -8,7 +8,6 @@ public class Point : Drop
 
     protected override float GetPickUpRange()
     {
-        Debug.Log(base.GetPickUpRange() * Player.GetMod(ModType.PICK_UP_RANGE));
         return base.GetPickUpRange() * Player.GetMod(ModType.PICK_UP_RANGE);
     }
 
